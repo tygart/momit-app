@@ -310,10 +310,7 @@ class RootWindow(BoxLayout):
 
     def translate_unicode(self, data_got):
 
-
-
         data = [{'msg':'','name':'','time':'','url':'','len':0} for _ in range(0, 50, 1)]
-
         
         for x in range(0, len(data_got), 1):
             data[x]['msg'] += data_got[x]['msg']
@@ -339,7 +336,6 @@ class RootWindow(BoxLayout):
                 i+=1
         
 
-
     def add_hyperlinks(self, data):
 
         for x in range(0, len(data), 1):
@@ -349,6 +345,7 @@ class RootWindow(BoxLayout):
                 
                 z = '[color=#7F0000][b][ref=' + data[x]['url'] + ']<<LINK>>[/ref][/b][/color]'
                 data[x]['msg'] = y.replace(('\u00ABlink\u00BB').decode('unicode_escape'), z)
+
 
     def build_board(self):
 
