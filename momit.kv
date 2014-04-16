@@ -1,0 +1,531 @@
+#:kivy 1.7.2
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+#:import Clock kivy.clock
+
+<RootWindow>:
+
+    id: root_wid
+    orientation: 'vertical'
+    pos: self.pos
+    size: self.size
+    canvas:
+        Color:
+            rgba: 0.9843, 0.9765, 0.9137,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        id: first_box
+        orientation: 'horizontal'
+        height: dp(91)
+        size_hint: 1, None
+
+
+        canvas:
+            Color:
+                rgba: 0.3725,0,0, 1
+            Rectangle:
+                pos: self.pos
+                size: self.width, self.height
+            Color:
+                rgba: 0.8431,0.7529,0.1451, 1
+            Rectangle:
+                pos: self.pos
+                size: self.width, self.height*21/64
+            Color:
+                rgba: 0.9843, 0.9765, 0.9137,1
+            Rectangle:
+                pos: self.pos
+                size: self.width, self.height*18/64
+
+
+        StackLayout:
+            orientation: 'lr-tb'
+            padding: 0
+            spacing: 0
+            size_hint: None,None
+            size: dp(90),dp(90)
+            canvas.before:
+                Color:
+                    rgba: 1,0,0,0.0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Image:
+                pos: root.pos
+                height: dp(85)
+                width: dp(85)
+                size_hint: None,None
+                source: 'data/momit_icon4.png'
+                allow_stretch: False
+                keep_ratio: True
+
+                canvas:
+                    Color:
+                        rgba: 0,0,1, 0.0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+
+        StackLayout:
+            orientation: 'rl-tb'
+            padding: dp(8)
+            spacing: dp(7)
+
+            canvas.before:
+                Color:
+                    rgba: 0,1,0,0.0
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            CustomButton:
+
+                text: ' post '
+                text_size: None,self.height
+                font_size: dp(20)
+
+                valign: 'middle'
+
+                size_hint:None,None
+                size: dp(60),dp(45)
+                on_press: _screen_manager.current = 'post'
+                canvas.before:
+                    Color:
+                        rgba: 0.8824,0.9216,0.9490, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            CustomButton:
+
+                text: ' login '
+                text_size: None,self.height
+                font_size: dp(20)
+                valign: 'middle'
+
+                size_hint:None,None
+                size: dp(70),dp(45)
+                on_press: _screen_manager.current = 'login'
+                on_press: root.load_notes()
+                canvas.before:
+                    Color:
+                        rgba: 0.8824,0.9216,0.9490, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            CustomButton:
+
+                text: ' refresh '
+                text_size: None,self.height
+                font_size: dp(20)
+                valign: 'middle'
+
+                size_hint:None,None
+                size: dp(90),dp(45)
+                on_press: root.refresh()
+                canvas.before:
+                    Color:
+                        rgba: 0.8824,0.9216,0.9490, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+
+    FloatLayout:
+        id: first_float
+        size_hint: 1,1
+        canvas:
+            Color:
+                rgba: 1,0,0,0.0
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        ScreenManager:
+            id: _screen_manager
+            transition: SlideTransition(direction="up")
+
+            Screen:
+                name: 'loading'
+                id: screen_loading
+                canvas:
+                    Color:
+                        rgba: 1,1,0.0, 0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Loading:
+                    id: loading
+                    pos: root.width/2-dp(32), root.height/2-dp(32)
+
+
+                    canvas:
+                        Color:
+                            rgba: 1,0,1, 0.0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+
+
+            Screen:
+                name: 'post'
+                id: screen_post
+
+
+                StackLayout:
+                    id: post_layout
+                    orientation: 'tb-lr'
+                    size_hint: 1, 1
+
+                    spacing:dp(10)
+                    padding:dp(10)
+                    canvas:
+                        Color:
+                            rgba: 0,1,0, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    Label:
+                        id: postname
+                        text: 'Login info. needed.'
+                        size_hint: None, None
+                        size: self.texture_size
+                        color: 0,0,0, 1
+                        font_size: dp(20)
+
+
+                    TextInput:
+                        id: post
+                        text: ''
+                        size_hint: 1, None
+                        background_color: 1,1,1,1
+                        background_active: 'data/textinput1.png'
+                        background_normal: 'data/textinput2.png'
+                        font_size: dp(20)
+                        height: dp(200)
+                        multiline: True
+
+
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint: 1, None
+                        height: dp(51)
+                        spacing:dp(10)
+                        padding:dp(10)
+                        canvas:
+                            Color:
+                                rgba: 0,1,0, 0.0
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                        CustomButton:
+
+                            text: 'twss'
+                            text_size: None,self.height
+                            font_size: dp(30)
+                            valign: 'middle'
+
+                            size_hint: None, None
+                            height: dp(40)
+                            width: dp(70)
+                            on_press: root.twss()
+
+                        CustomButton:
+
+                            text: 'http'
+                            text_size: None,self.height
+                            font_size: dp(30)
+                            valign: 'middle'
+
+                            size_hint: None, None
+                            height: dp(40)
+                            width: dp(70)
+                            on_press: root.http()
+
+                        CustomButton:
+
+                            text: 'Back'
+                            text_size: None,self.height
+                            font_size: dp(30)
+                            valign: 'middle'
+
+                            size_hint: 1, None
+                            height: dp(40)
+                            on_press: root.post_back()
+
+                        CustomButton:
+
+                            text: 'Send'
+                            text_size: None,self.height
+                            font_size: dp(30)
+                            valign: 'middle'
+
+                            size_hint: 1, None
+                            height: dp(40)
+                            on_press: root.submit_post()
+
+
+            Screen:
+                name: 'login'
+                id: screen_login
+
+
+                StackLayout:
+                    orientation: 'tb-lr'
+                    size_hint: 1, 1
+
+                    spacing:dp(10)
+                    padding:dp(10)
+                    canvas:
+                        Color:
+                            rgba: 0,1,0, 0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    Label:
+                        text: '  username  '
+                        size_hint: None, None
+                        color: 0,0,0,1
+                        size: self.texture_size
+                        font_size: dp(20)
+
+                    TextInput:
+                        id: user_text
+                        size_hint: 1, None
+                        background_color: 1,1,1,1
+                        background_active: 'data/textinput1.png'
+                        background_normal: 'data/textinput2.png'
+                        font_size: dp(20)
+                        height: dp(40)
+                        id: usern
+                        multiline: False
+                        on_text: root.unverified()
+
+
+                    Label:
+                        text: '  password  '
+                        size_hint: None, None
+                        size: self.texture_size
+                        color: 0,0,0,1
+                        font_size: dp(20)
+
+
+                    TextInput:
+                        size_hint: 1, None
+                        background_color: 1,1,1,1
+                        background_active: 'data/textinput1.png'
+                        background_normal: 'data/textinput2.png'
+                        font_size: dp(20)
+                        height: dp(40)
+                        id: passw
+                        multiline: False
+                        password: True
+                        on_text: root.unverified()
+
+                    Label:
+                        id: verified
+                        font_size: dp(35)
+                        size_hint: 1, None
+                        height: dp(40)
+                        color: 0.3725,0,0, 1
+
+
+
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint: 1, None
+                        height: dp(51)
+                        spacing:dp(10)
+                        padding:dp(10)
+                        canvas:
+                            Color:
+                                rgba: 0,1,0, 0.0
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                        CustomButton:
+
+                            text: 'Back'
+                            text_size: None,self.height
+                            font_size: dp(30)
+                            valign: 'middle'
+
+                            size_hint: 1, None
+                            height: dp(40)
+                            on_press: root.post_back()
+
+                        CustomButton:
+
+                            id:save_button
+                            text: 'Save'
+                            text_size: None,self.height
+                            font_size: dp(30)
+                            valign: 'middle'
+
+                            size_hint: 1, None
+                            height: dp(40)
+                            on_press: _screen_manager.current = 'loading'
+                            on_press: root.save_notes()
+
+
+            Screen:
+                name: 'msgs'
+                id: screen_msgs
+
+                ScrollView:
+                    id: screen_msgs_scroll
+                    on_size: root.build_board()
+
+                    canvas.before:
+                        Color:
+                            rgba: 1,0,0, 0.0
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+
+<CustomButton>:
+    color: 0.8431,0.7529,0.1451, 1
+    background_normal: 'data/round_black.png'
+	background_down: 'data/round_lmaroon2.png'
+	#background_color:0,0,0,.5
+    canvas.before:
+        Color:
+            rgba: 0,0,0, 0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<Posty>:
+    color: 0,0,0,1
+    text_size: self.width, None
+    size_hint: 1, None
+    markup: True
+    on_ref_press: self.openurl(*args)
+
+    canvas.before:
+        Color:
+            rgba:  0.9686,0.9529,0.8275,.75
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Posty2>:
+    color: 0,0,0,1
+    text_size:self.width, None
+    size_hint: 1, None
+    markup: True
+    on_ref_press: self.openurl2(*args)
+
+    canvas.before:
+        Color:
+            rgba: 0.9843, 0.9765, 0.9137,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<PostyBase>:
+    id: post_base
+    orientation: 'rl-tb'
+    padding: 0
+    spacing: 0
+    height: self.minimum_height
+    size_hint: 1, None
+
+<HeaderPost>:
+    id: header_root
+    orientation: 'vertical'
+    size_hint: 1, None
+    height: dp(30)
+    canvas.before:
+        Color:
+            rgba: self.r, self.g, self.b,.75
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint: 1, None
+        height: dp(30)
+        canvas.before:
+            Color:
+                rgba: 0,1,0,0.0
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        StackLayout:
+            orientation: 'lr-tb'
+            Label:
+                id: header_name
+                markup: True
+                size_hint: None, 1
+                #text_size: self.size
+                size:self.texture_size
+                halign: 'left'
+                canvas.before:
+                    Color:
+                        rgba: 0,0,1,0.0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+
+        StackLayout:
+            orientation: 'rl-tb'
+            Label:
+                id: header_time
+                color: 0,0,0,1
+                markup: True
+                size_hint: None, 1
+                size:self.texture_size
+
+                canvas.before:
+                    Color:
+                        rgba: 0,0,1,0.0
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+<Loading>:
+    img: img
+    orientation: 'lr-tb'
+    height: dp(64)
+    width: dp(64)
+    size_hint: None,None
+    canvas.before:
+        Color:
+            rgba: 0,0,1,0.0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+    Image:
+        id: img
+
+        pos: root.width/2-dp(0), root.height/2-dp(0)
+        source:'atlas://data/loading_m.atlas/{}'.format(1)
+        allow_stretch: True
+        keep_ratio: True
+        canvas.before:
+            Color:
+                rgba: 0,1,0,0
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+    Label:
+        text:'Loading'
+        font_size: dp(25)
+        color: 0,0,0,1
+
+
+
