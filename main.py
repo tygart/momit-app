@@ -84,14 +84,14 @@ class RootWindow(BoxLayout):
         user = self.user.text
         password = self.passwor.text
 
-        s = requests.Session()  #need session to simulate real web browser
+        s = requests.Session()
         s.keep_alive = False
         url = 'http://www.momit.org'
         a = requests.adapters.HTTPAdapter(max_retries=3)
         s.mount(url, a)
 
         try:
-            result = s.get(url, timeout=1)  #request for hidden form field input
+            result = s.get(url, timeout=1)
         except requests.exceptions.ConnectionError as e:
             print(e)
             text='App: time and money wasted! :( Connection error.'
@@ -117,45 +117,43 @@ class RootWindow(BoxLayout):
 
         doc = lxml.html.fromstring(result.text)
 
-        #all the form fields
+        
         fields=[]
-        for a in doc.xpath('//*[@id="form-login"]/input'):  #gather hidden fields
-            #print(' name: %s' % a.name)
+        for a in doc.xpath('//*[@id="form-login"]/input'):
+            
             fields+=[a.name]
-            #print('value: %s' % a.value)
+            
             fields+=[a.value]
-        #print(fields)
+        
 
         login_data={'Submit':'Login', 'username': user, 'passwd': password, 'task': 'login','option': 'com_user',
                         'silent': 'true', 'return': fields[-3], fields[-2]: '1'}
-        result2 = s.post(url, data=login_data) #actually login here
-        #print(login_data)
+        result2 = s.post(url, data=login_data)
 
         doc2 = lxml.html.fromstring(result2.text)
 
-        output2 = doc2.xpath('//*[@id="leftcol"]/div/div[1]/div/div[2]/h3/text()')  #test if login was success
-        out_test = (str(output2[0]))
+        output2 = doc2.xpath('//*[@id="leftcol"]/div/div[1]/div/div[2]/h3/text()') 
         if out_test == 'Guild Chat Jr.':
             self.verified()
             print('login passed')
             self.ids.postname.text = doc2.xpath('//*[@id="chatForm"]/p/label[1]/em/text()')[0]+':'
-            #print(self.data2)
+            
             with open(self.notes_fn, 'wb') as fd:
                 json.dump(self.data2, fd)
-            #print(post_m)
+            
 
             if isinstance(post_m, str):
                 fields=[]
                 print('post called')
-                for a in doc2.xpath('//*[@id="form-login"]/input'):  #gather hidden fields
-                    #print(' name: %s' % a.name)
+                for a in doc2.xpath('//*[@id="form-login"]/input'):
+                    
                     fields+=[a.name]
-                    #print('value: %s' % a.value)
+                    
                     fields+=[a.value]
                 post_name=doc2.xpath('//*[@id="chatForm"]/p/label[1]/em/text()')
-                #print(post_name[0])
+                
                 jal_id=doc2.xpath('//*[@id="jal_lastID"]/@value')
-                #print(jal_id[0])
+                
                 post_data={'submit':'Send', 'shoutboxname':post_name[0], 'shoutboxurl':'http://',
                            'chatbarText': post_m, 'jal_lastID':jal_id[0], 'shout_no_js':'true'}
                 result3 = s.post(url, data=post_data)
@@ -176,7 +174,7 @@ class RootWindow(BoxLayout):
             self.get_data()
         else:
             print('no response to login')
-            #self.unverified()
+            
 
 
     def twss(self):
@@ -200,7 +198,7 @@ class RootWindow(BoxLayout):
 
     def _on_error(self, requ, text=None, *args):
         print('login failure')
-        with open(self.notes_fn, 'wb') as fd:  #save login info in case this failed on save login
+        with open(self.notes_fn, 'wb') as fd:
                 json.dump(self.data2, fd)
         print(text)
         if not isinstance(text, str):
@@ -232,14 +230,14 @@ class RootWindow(BoxLayout):
 
 
     def post_adjust_height(self,post,width):
-        #print(post,width)
-        ratio = dp(6.9) #width of panel per number of characters
+        
+        ratio = dp(6.9)
         a=float(post)
         b=float(width)
         c=a*ratio/b
-        if (a*ratio/b)%1 > 0: # here so i don't have to import math for roundup
+        if (a*ratio/b)%1 > 0: 
             c+=1
-        height = int(c)*dp(20) # number of lines times height of a line
+        height = int(c)*dp(20)
         return height
 
 
@@ -281,8 +279,6 @@ class RootWindow(BoxLayout):
                 order+=[j]
                 data={ 'entry': x+1, 'msg': post, 'url': link, 'time': time}
                 self.req_app += [data]
-        #print(self.req_app)
-        #print(self.req)
 
 
         print('number of posts via app: %i' % len(self.req_app))
@@ -307,7 +303,7 @@ class RootWindow(BoxLayout):
         self.ids.loading.anim_load()
         print('start fired')
         self.load_notes()
-        #print(self.data2['user'])
+       
         if self.data2['user'] == '':
             self.get_data()
         else:
@@ -338,12 +334,12 @@ class RootWindow(BoxLayout):
 
         data = [{'msg':'','name':'','time':'','url':'','len':0} for _ in range(0, 50, 1)]
 
-        #print(len(data_got))
+        
         for x in range(0, len(data_got), 1):
             data[x]['msg'] += data_got[x]['msg']
             data[x]['time'] += data_got[x]['time'].encode('ascii', 'replace')+' ago'
             data[x]['url'] += data_got[x]['url'].encode('ascii', 'replace')
-        #print(data)
+        
         return data
 
 
@@ -355,29 +351,27 @@ class RootWindow(BoxLayout):
             i=0
             for char in y:
                 if char == ':':
-                    #print(z[:i])
+                    
                     data[x]['name']='[color=#7F0000][b]'+(y[:i+1])+'[/b][/color]'
                     data[x]['msg']=(y[i+1:])
                     data[x]['len'] += len(data[x]['msg'])
                     break
                 i+=1
-        #print(data)
+        
 
 
     def add_hyperlinks(self, data):
 
         for x in range(0, len(data), 1):
-            y = data[x]['msg']
-            #print(y)
+            y = data[x]['msg']  
 
             if ('\u00ABlink\u00BB').decode('unicode_escape') in y:
-                #print('called replace link')
+                
                 z = '[color=#7F0000][b][ref=' + data[x]['url'] + ']<<LINK>>[/ref][/b][/color]'
                 data[x]['msg'] = y.replace(('\u00ABlink\u00BB').decode('unicode_escape'), z)
 
     def build_board(self):
 
-        #remove ths scroll widget
         self.ids.screen_msgs_scroll.clear_widgets()
 
         board = PostyBase()
@@ -408,9 +402,7 @@ class RootWindow(BoxLayout):
             else:
                 board.add_widget(Posty2(text=self.req2[x]['msg'], height=y))
 
-        #add the scroll widget
         self.ids.screen_msgs_scroll.add_widget(board)
-        #switch to messages screen
         self.ids._screen_manager.current = 'msgs'
         self.ids.loading.anim_close()
 
@@ -454,9 +446,8 @@ class Loading(StackLayout):
 
 
     def nxt(self, dt):
-        #print("showing {}".format(self.curimg))
         while self.anim:
-            #print(self.curimg)
+
             self.ids.img.source = 'atlas://data/loading_m.atlas/{}'.format(self.curimg)
             self.curimg += 1
             if self.curimg >= 13:
@@ -468,13 +459,10 @@ class Loading(StackLayout):
         self.anim = True
         thread = Thread(target=self.nxt, args=(float(1)/15,))
         thread.start()
-        #print('anim_load called')
-        #self.curimg = 1
 
 
     def anim_close(self):
         self.anim = False
-        #print('anim_close called')
 
 
 class MomitApp(App):
