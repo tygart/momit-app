@@ -42,10 +42,6 @@ class RootWindow(BoxLayout):
         self.data2 = {'user':'','pass':''}
 
 
-    def home(self, touch):
-        print "home fired"
-        webbrowser.open('http://www.momit.org')
-
     def load_notes(self):
         if not exists(self.notes_fn):
             return
@@ -116,13 +112,10 @@ class RootWindow(BoxLayout):
             return
 
         doc = lxml.html.fromstring(result.text)
-
         
         fields=[]
-        for a in doc.xpath('//*[@id="form-login"]/input'):
-            
-            fields+=[a.name]
-            
+        for a in doc.xpath('//*[@id="form-login"]/input'):  
+            fields+=[a.name]       
             fields+=[a.value]
         
 
@@ -145,11 +138,10 @@ class RootWindow(BoxLayout):
             if isinstance(post_m, str):
                 fields=[]
                 print('post called')
-                for a in doc2.xpath('//*[@id="form-login"]/input'):
-                    
-                    fields+=[a.name]
-                    
+                for a in doc2.xpath('//*[@id="form-login"]/input'): 
+                    fields+=[a.name]            
                     fields+=[a.value]
+
                 post_name=doc2.xpath('//*[@id="chatForm"]/p/label[1]/em/text()')
                 
                 jal_id=doc2.xpath('//*[@id="jal_lastID"]/@value')
@@ -176,24 +168,12 @@ class RootWindow(BoxLayout):
             print('no response to login')
             
 
-
     def twss(self):
         self.ids.post.insert_text('that\'s what she said', from_undo=False)
 
+
     def http(self):
         self.ids.post.insert_text('http://', from_undo=False)
-
-    def _on_success(self, requ, *args):
-        pass
-
-    def _on_redirect(self, requ, *args):
-        pass
-
-    def _on_progress(self, requ, *args):
-        pass
-
-    def _on_failure(self, requ, *args):
-        pass
 
 
     def _on_error(self, requ, text=None, *args):
