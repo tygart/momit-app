@@ -1,4 +1,4 @@
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 from time import sleep
 from kivy.clock import Clock
@@ -87,7 +87,7 @@ class RootWindow(BoxLayout):
         s.mount(url, a)
 
         try:
-            result = s.get(url, timeout=1)
+            result = s.get(url, timeout=10)
         except requests.exceptions.ConnectionError as e:
             print(e)
             text='App: time and money wasted! :( Connection error.'
