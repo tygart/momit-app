@@ -1,9 +1,7 @@
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 
-from time import sleep
 from kivy.clock import Clock
 from kivy.network.urlrequest import UrlRequest
-import json
 from os.path import join, exists
 from kivy.app import App
 from kivy.uix.button import Button
@@ -11,6 +9,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.widget import Widget
 from kivy.properties import NumericProperty
 from kivy.graphics import Color, BorderImage
@@ -21,11 +20,12 @@ from kivy.uix.scrollview import ScrollView
 from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.atlas import Atlas
+import json
+from threading import Thread
 import lxml.html
 import requests
 from functools import partial
 import webbrowser
-from threading import Thread
 
 
 class RootWindow(BoxLayout):
@@ -36,7 +36,6 @@ class RootWindow(BoxLayout):
         self.req = None
         self.req_app = None
         self.req2 = [{'msg':'','name':'','time':'','url':'','len':0} for _ in range(0, 50, 1)]
-        self.req2_app = [{'msg':'','name':'','time':'','url':'','len':0} for _ in range(0, 50, 1)]
         self.user = self.ids.usern
         self.passwor = self.ids.passw
         self.data2 = {'user':'','pass':''}
@@ -56,7 +55,7 @@ class RootWindow(BoxLayout):
 
     def save_notes(self):
 
-        self.ids.loading.anim_load()
+        App.get_running_app().tog.next()
         Window.release_all_keyboards()
         self.data2['user']=self.user.text
         self.data2['pass']=self.passwor.text
@@ -64,15 +63,19 @@ class RootWindow(BoxLayout):
 
 
     def unverified(self):
-
         label = self.ids.verified
         label.text = 'unverified'
 
 
     def verified(self):
-
         label = self.ids.verified
         label.text = 'verified'
+
+
+    def login_m(self, post_m=None, *args):
+        print('called login check')
+        user = self.user.text
+        password = self.passwor.text
 
 
     def login_m(self,post_m=None,*args):
@@ -112,12 +115,12 @@ class RootWindow(BoxLayout):
             return
 
         doc = lxml.html.fromstring(result.text)
-        
+
         fields=[]
-        for a in doc.xpath('//*[@id="form-login"]/input'):  
-            fields+=[a.name]       
+        for a in doc.xpath('//*[@id="form-login"]/input'):
+            fields+=[a.name]
             fields+=[a.value]
-        
+
 
         login_data={'Submit':'Login', 'username': user, 'passwd': password, 'task': 'login','option': 'com_user',
                         'silent': 'true', 'return': fields[-3], fields[-2]: '1'}
@@ -125,27 +128,25 @@ class RootWindow(BoxLayout):
 
         doc2 = lxml.html.fromstring(result2.text)
 
-        output2 = doc2.xpath('//*[@id="leftcol"]/div/div[1]/div/div[2]/h3/text()') 
+        output2 = doc2.xpath('//*[@id="leftcol"]/div/div[1]/div/div[2]/h3/text()')
+        out_test = (str(output2[0]))
         if out_test == 'Guild Chat Jr.':
             self.verified()
-            print('login passed')
+
             self.ids.postname.text = doc2.xpath('//*[@id="chatForm"]/p/label[1]/em/text()')[0]+':'
-            
             with open(self.notes_fn, 'wb') as fd:
                 json.dump(self.data2, fd)
-            
 
             if isinstance(post_m, str):
                 fields=[]
-                print('post called')
-                for a in doc2.xpath('//*[@id="form-login"]/input'): 
-                    fields+=[a.name]            
+
+                for a in doc2.xpath('//*[@id="form-login"]/input'):
+                    fields+=[a.name]
                     fields+=[a.value]
 
                 post_name=doc2.xpath('//*[@id="chatForm"]/p/label[1]/em/text()')
-                
                 jal_id=doc2.xpath('//*[@id="jal_lastID"]/@value')
-                
+
                 post_data={'submit':'Send', 'shoutboxname':post_name[0], 'shoutboxurl':'http://',
                            'chatbarText': post_m, 'jal_lastID':jal_id[0], 'shout_no_js':'true'}
                 result3 = s.post(url, data=post_data)
@@ -153,24 +154,22 @@ class RootWindow(BoxLayout):
                 doc3 = lxml.html.fromstring(result3.text)
                 self.get_data_app(doc3)
             else:
-                print('get called')
+
                 self.get_data_app(doc2)
 
         elif out_test == 'Login/Logout':
             self.unverified()
-            print('login failed')
             self.ids.postname.text = 'Login info. needed.'
             print(self.data2)
             with open(self.notes_fn, 'wb') as fd:
                 json.dump(self.data2, fd)
             self.get_data()
         else:
-            print('no response to login')
-            
+            pass
+
 
     def twss(self):
         self.ids.post.insert_text('that\'s what she said', from_undo=False)
-
 
     def http(self):
         self.ids.post.insert_text('http://', from_undo=False)
@@ -203,19 +202,18 @@ class RootWindow(BoxLayout):
             self.ids._screen_manager.current = 'login'
             return
         self.ids._screen_manager.current = 'loading'
-        self.ids.loading.anim_load()
+        App.get_running_app().tog.next()
         self.post = self.ids.post.text
         print('submit: %s' % self.post)
         Clock.schedule_once(partial(self.login_m,self.post),1)
 
 
     def post_adjust_height(self,post,width):
-        
         ratio = dp(6.9)
         a=float(post)
         b=float(width)
         c=a*ratio/b
-        if (a*ratio/b)%1 > 0: 
+        if (a*ratio/b)%1 > 0:
             c+=1
         height = int(c)*dp(20)
         return height
@@ -223,7 +221,11 @@ class RootWindow(BoxLayout):
 
     def post_back(self):
         Window.release_all_keyboards()
-        self.ids._screen_manager.current = 'msgs'
+        label = self.ids.verified
+        if label.text == 'verified':        
+            self.ids._screen_manager.current = 'msgs'
+        else:
+            self.ids._screen_manager.current = 'login'
 
 
     def get_data_app(self, doc2):
@@ -260,12 +262,13 @@ class RootWindow(BoxLayout):
                 data={ 'entry': x+1, 'msg': post, 'url': link, 'time': time}
                 self.req_app += [data]
 
-
         print('number of posts via app: %i' % len(self.req_app))
         self.req2 = self.translate_unicode(self.req_app)
         self.seperate_name(self.req2)
         self.add_hyperlinks(self.req2)
         self.build_board()
+        print('final animation call')
+        App.get_running_app().tog.next()
 
 
     def data_callback(self, requ, result):
@@ -276,14 +279,14 @@ class RootWindow(BoxLayout):
         self.seperate_name(self.req2)
         self.add_hyperlinks(self.req2)
         self.build_board()
+        print('final animation call')
+        App.get_running_app().tog.next()
 
 
     def start(self):
 
-        self.ids.loading.anim_load()
         print('start fired')
         self.load_notes()
-       
         if self.data2['user'] == '':
             self.get_data()
         else:
@@ -291,7 +294,7 @@ class RootWindow(BoxLayout):
 
 
     def refresh(self):
-        self.ids.loading.anim_load()
+        App.get_running_app().tog.next()
         self.ids._screen_manager.current = 'loading'
 
         if self.data2['user'] == '':
@@ -301,22 +304,20 @@ class RootWindow(BoxLayout):
 
 
     def get_data(self, *args):
-
-        self.requ = UrlRequest('https://free-ec2.scraperwiki.com/fmu2kwa/b4f746c592224f3/sql/?q=select%20%0A%09msg%2C%'
-                              '0A%09entry%2C%0A%09url%2C%0A%20%20%20%20time%0Afrom%20swdata%0A--%20where%20url%20%3E%'
-                              '20%0Aorder%20by%20entry%0Alimit%2050', on_success=self.data_callback,
-                               on_error=self._on_error)
+        
+        self.ids._screen_manager.current = 'login'
+        App.get_running_app().tog.next()
 
 
     def translate_unicode(self, data_got):
 
         data = [{'msg':'','name':'','time':'','url':'','len':0} for _ in range(0, 50, 1)]
-        
+
         for x in range(0, len(data_got), 1):
             data[x]['msg'] += data_got[x]['msg']
             data[x]['time'] += data_got[x]['time'].encode('ascii', 'replace')+' ago'
             data[x]['url'] += data_got[x]['url'].encode('ascii', 'replace')
-        
+
         return data
 
 
@@ -328,21 +329,19 @@ class RootWindow(BoxLayout):
             i=0
             for char in y:
                 if char == ':':
-                    
                     data[x]['name']='[color=#7F0000][b]'+(y[:i+1])+'[/b][/color]'
                     data[x]['msg']=(y[i+1:])
                     data[x]['len'] += len(data[x]['msg'])
                     break
                 i+=1
-        
+
 
     def add_hyperlinks(self, data):
 
         for x in range(0, len(data), 1):
-            y = data[x]['msg']  
+            y = data[x]['msg']
 
             if ('\u00ABlink\u00BB').decode('unicode_escape') in y:
-                
                 z = '[color=#7F0000][b][ref=' + data[x]['url'] + ']<<LINK>>[/ref][/b][/color]'
                 data[x]['msg'] = y.replace(('\u00ABlink\u00BB').decode('unicode_escape'), z)
 
@@ -381,7 +380,7 @@ class RootWindow(BoxLayout):
 
         self.ids.screen_msgs_scroll.add_widget(board)
         self.ids._screen_manager.current = 'msgs'
-        self.ids.loading.anim_close()
+        App.get_running_app().loading_end()
 
 
 class PostyBase(StackLayout):
@@ -414,47 +413,38 @@ class CustomButton(Button):
     pass
 
 
-class Loading(StackLayout):
-    curimg = 1
-
-    def __init__(self, **kwargs):
-        super(Loading, self).__init__(**kwargs)
-        self.anim = True
-
-
-    def nxt(self, dt):
-        while self.anim:
-
-            self.ids.img.source = 'atlas://data/loading_m.atlas/{}'.format(self.curimg)
-            self.curimg += 1
-            if self.curimg >= 13:
-                self.curimg = 1
-            sleep(dt)
-
-
-    def anim_load(self, *args):
-        self.anim = True
-        thread = Thread(target=self.nxt, args=(float(1)/15,))
-        thread.start()
-
-
-    def anim_close(self):
-        self.anim = False
-
-
 class MomitApp(App):
+    curimg =1
 
     def build(self):
-
+        self.tog=self.toggle()
         self.root = RootWindow()
         self.root.save_path = self.user_data_dir
         Clock.schedule_once(self.start,0)
-
         return self.root
 
-
     def start(self, *args):
+        App.get_running_app().tog.next()
         self.root.start()
+
+    def nxt(self, dt):
+        self.root.img.source = 'atlas://data/loading_m.atlas/{}'.format(self.curimg)
+        self.curimg += 1
+        if self.curimg >= 13:
+            self.curimg = 1
+
+    def loading_start(self):
+        Clock.schedule_interval(App.get_running_app().nxt, float(1)/30)
+        print('start animation fired')
+
+    def loading_end(self):
+        Clock.unschedule(App.get_running_app().nxt)
+        print('end animation fired')
+
+    def toggle(self):
+        while True:
+            yield self.loading_start()
+            yield self.loading_end()
 
 
 if __name__ == '__main__':

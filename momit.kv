@@ -8,19 +8,19 @@
     orientation: 'vertical'
     pos: self.pos
     size: self.size
+    img: img
     canvas:
         Color:
             rgba: 0.9843, 0.9765, 0.9137,1
         Rectangle:
             pos: self.pos
             size: self.size
+
     BoxLayout:
         id: first_box
         orientation: 'horizontal'
         height: dp(91)
         size_hint: 1, None
-
-
         canvas:
             Color:
                 rgba: 0.3725,0,0, 1
@@ -37,7 +37,6 @@
             Rectangle:
                 pos: self.pos
                 size: self.width, self.height*18/64
-
 
         StackLayout:
             orientation: 'lr-tb'
@@ -67,7 +66,6 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
-
 
         StackLayout:
             orientation: 'rl-tb'
@@ -134,7 +132,6 @@
                         pos: self.pos
                         size: self.size
 
-
     FloatLayout:
         id: first_float
         size_hint: 1,1
@@ -158,24 +155,50 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
-                Loading:
-                    id: loading
-                    pos: root.width/2-dp(32), root.height/2-dp(32)
 
+                AnchorLayout:
+                    anchor_x: 'center'
+                    anchor_y: 'center'
+                    StackLayout:
+                        orientation: 'lr-tb'
+                        size_hint: None, None
+                        size: dp(186), dp(46)
 
-                    canvas:
-                        Color:
-                            rgba: 1,0,1, 0.0
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-
-
+                        canvas:
+                            Color:
+                                rgba: 1, 0, 0, 0
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                        Image:
+                            id: img
+                            size: dp(46), dp(46)
+                            size_hint: None, None
+                            source: None
+                            canvas:
+                                Color:
+                                    rgba: 0, 0, 1, 0
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
+                        Label:
+                            size_hint: None, None
+                            size: self.texture_size
+                            valign: 'middle'
+                            font_size: dp(30)
+                            text_size: dp(140),dp(46)
+                            text: ' Loading'
+                            color: 0,0,0,1
+                            canvas:
+                                Color:
+                                    rgba: 0, 1, 0, 0
+                                Rectangle:
+                                    pos: self.pos
+                                    size: self.size
 
             Screen:
                 name: 'post'
                 id: screen_post
-
 
                 StackLayout:
                     id: post_layout
@@ -199,7 +222,6 @@
                         color: 0,0,0, 1
                         font_size: dp(20)
 
-
                     TextInput:
                         id: post
                         text: ''
@@ -210,7 +232,6 @@
                         font_size: dp(20)
                         height: dp(200)
                         multiline: True
-
 
                     BoxLayout:
                         orientation: 'horizontal'
@@ -270,7 +291,6 @@
                             height: dp(40)
                             on_press: root.submit_post()
 
-
             Screen:
                 name: 'login'
                 id: screen_login
@@ -308,14 +328,12 @@
                         multiline: False
                         on_text: root.unverified()
 
-
                     Label:
                         text: '  password  '
                         size_hint: None, None
                         size: self.texture_size
                         color: 0,0,0,1
                         font_size: dp(20)
-
 
                     TextInput:
                         size_hint: 1, None
@@ -335,8 +353,6 @@
                         size_hint: 1, None
                         height: dp(40)
                         color: 0.3725,0,0, 1
-
-
 
                     BoxLayout:
                         orientation: 'horizontal'
@@ -374,7 +390,6 @@
                             on_press: _screen_manager.current = 'loading'
                             on_press: root.save_notes()
 
-
             Screen:
                 name: 'msgs'
                 id: screen_msgs
@@ -390,7 +405,6 @@
                             pos: self.pos
                             size: self.size
 
-
 <CustomButton>:
     color: 0.8431,0.7529,0.1451, 1
     background_normal: 'data/round_black.png'
@@ -402,7 +416,6 @@
         Rectangle:
             pos: self.pos
             size: self.size
-
 
 <Posty>:
     color: 0,0,0,1
@@ -477,7 +490,6 @@
                         pos: self.pos
                         size: self.size
 
-
         StackLayout:
             orientation: 'rl-tb'
             Label:
@@ -493,39 +505,3 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
-
-<Loading>:
-    img: img
-    orientation: 'lr-tb'
-    height: dp(64)
-    width: dp(64)
-    size_hint: None,None
-    canvas.before:
-        Color:
-            rgba: 0,0,1,0.0
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-
-    Image:
-        id: img
-
-        pos: root.width/2-dp(0), root.height/2-dp(0)
-        source:'atlas://data/loading_m.atlas/{}'.format(1)
-        allow_stretch: True
-        keep_ratio: True
-        canvas.before:
-            Color:
-                rgba: 0,1,0,0
-            Rectangle:
-                pos: self.pos
-                size: self.size
-
-    Label:
-        text:'Loading'
-        font_size: dp(25)
-        color: 0,0,0,1
-
-
-
