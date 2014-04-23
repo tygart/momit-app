@@ -184,6 +184,7 @@ class RootWindow(BoxLayout):
         self.seperate_name(self.req2)
         self.add_hyperlinks(self.req2)
         self.build_board()
+        App.get_running_app().tog.next()
 
 
     @property
