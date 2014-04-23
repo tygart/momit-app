@@ -1,4 +1,4 @@
-__version__ = '0.2.5'
+__version__ = '0.2.7'
 
 from kivy.clock import Clock
 from kivy.network.urlrequest import UrlRequest
@@ -47,8 +47,8 @@ class RootWindow(BoxLayout):
         with open(self.notes_fn, 'rb') as fd:
             data1 = json.load(fd)
         self.data2 = data1
-        print(self.save_path)
-        print(self.data2)
+        #print(self.save_path)
+        #print(self.data2)
         self.user.text = self.data2['user']
         self.passwor.text = self.data2['pass']
 
@@ -72,14 +72,8 @@ class RootWindow(BoxLayout):
         label.text = 'verified'
 
 
-    def login_m(self, post_m=None, *args):
-        print('called login check')
-        user = self.user.text
-        password = self.passwor.text
-
-
     def login_m(self,post_m=None,*args):
-        print('called login check')
+        #print('called login check')
         user = self.user.text
         password = self.passwor.text
 
@@ -91,11 +85,13 @@ class RootWindow(BoxLayout):
 
         try:
             result = s.get(url, timeout=10)
+
         except requests.exceptions.ConnectionError as e:
             print(e)
             text='App: time and money wasted! :( Connection error.'
             Clock.schedule_once(partial(self._on_error, text),1)
             return
+
         except requests.exceptions.HTTPError as e:
             print(e)
             text='App: time and money wasted! :( HTTP error.'
@@ -120,7 +116,6 @@ class RootWindow(BoxLayout):
         for a in doc.xpath('//*[@id="form-login"]/input'):
             fields+=[a.name]
             fields+=[a.value]
-
 
         login_data={'Submit':'Login', 'username': user, 'passwd': password, 'task': 'login','option': 'com_user',
                         'silent': 'true', 'return': fields[-3], fields[-2]: '1'}
@@ -160,7 +155,7 @@ class RootWindow(BoxLayout):
         elif out_test == 'Login/Logout':
             self.unverified()
             self.ids.postname.text = 'Login info. needed.'
-            print(self.data2)
+            #print(self.data2)
             with open(self.notes_fn, 'wb') as fd:
                 json.dump(self.data2, fd)
             self.get_data()
@@ -171,15 +166,16 @@ class RootWindow(BoxLayout):
     def twss(self):
         self.ids.post.insert_text('that\'s what she said', from_undo=False)
 
+
     def http(self):
         self.ids.post.insert_text('http://', from_undo=False)
 
 
     def _on_error(self, requ, text=None, *args):
-        print('login failure')
+        #print('login failure')
         with open(self.notes_fn, 'wb') as fd:
                 json.dump(self.data2, fd)
-        print(text)
+
         if not isinstance(text, str):
             text = 'App: time and money wasted! :( connection error.'
         data4={ 'entry': 0, 'msg': text,
@@ -204,7 +200,7 @@ class RootWindow(BoxLayout):
         self.ids._screen_manager.current = 'loading'
         App.get_running_app().tog.next()
         self.post = self.ids.post.text
-        print('submit: %s' % self.post)
+        #print('submit: %s' % self.post)
         Clock.schedule_once(partial(self.login_m,self.post),1)
 
 
@@ -237,7 +233,7 @@ class RootWindow(BoxLayout):
             doc2.cssselect('#outputList > li > a')[0].get('href')
         except IndexError:
             testlinks=False
-            print 'No Links'
+            #print('No Links')
 
         for entry in doc2.cssselect('#outputList'):
             for x in range(0, 50, 1):
@@ -262,30 +258,17 @@ class RootWindow(BoxLayout):
                 data={ 'entry': x+1, 'msg': post, 'url': link, 'time': time}
                 self.req_app += [data]
 
-        print('number of posts via app: %i' % len(self.req_app))
+        #print('number of posts via app: %i' % len(self.req_app))
         self.req2 = self.translate_unicode(self.req_app)
         self.seperate_name(self.req2)
         self.add_hyperlinks(self.req2)
         self.build_board()
-        print('final animation call')
-        App.get_running_app().tog.next()
-
-
-    def data_callback(self, requ, result):
-        self.req = result
-
-        print('number of posts: %i' % len(self.req))
-        self.req2 = self.translate_unicode(self.req)
-        self.seperate_name(self.req2)
-        self.add_hyperlinks(self.req2)
-        self.build_board()
-        print('final animation call')
         App.get_running_app().tog.next()
 
 
     def start(self):
 
-        print('start fired')
+        #print('start fired')
         self.load_notes()
         if self.data2['user'] == '':
             self.get_data()
@@ -390,14 +373,14 @@ class PostyBase(StackLayout):
 class Posty(Label):
 
     def openurl(self, *args):
-        print "openurl fired"
+        #print("openurl fired")
         webbrowser.open(args[1])
 
 
 class Posty2(Label):
 
     def openurl2(self, *args):
-        print "openurl2 fired"
+        #print("openurl2 fired")
         webbrowser.open(args[1])
 
 
@@ -435,11 +418,11 @@ class MomitApp(App):
 
     def loading_start(self):
         Clock.schedule_interval(App.get_running_app().nxt, float(1)/30)
-        print('start animation fired')
+        #print('start animation fired')
 
     def loading_end(self):
         Clock.unschedule(App.get_running_app().nxt)
-        print('end animation fired')
+        #print('end animation fired')
 
     def toggle(self):
         while True:
