@@ -21,7 +21,6 @@ from kivy.core.window import Window
 from kivy.metrics import dp
 from kivy.atlas import Atlas
 import json
-from threading import Thread
 import lxml.html
 import requests
 from functools import partial
